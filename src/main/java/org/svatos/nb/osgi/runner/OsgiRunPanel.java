@@ -31,7 +31,6 @@ import org.openide.util.NbPreferences;
  */
 public class OsgiRunPanel extends javax.swing.JPanel {
 
-    
     private final String[] bundles = new String[]{
         "javax.servlet",
         "org.apache.felix.gogo.command",
@@ -54,6 +53,7 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         "org.eclipse.osgi.util"};
 
     private final String vmArgumentsString = "-Dosgi.requiredJavaVersion=1.7 -Xms40m -Xmx512m -Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.log.level=LOG_DEBUG -Dorg.osgi.service.http.port=44444";
+    private final List<Project> projects;
 
     /**
      * Creates new form OsgiRunPanel
@@ -62,18 +62,23 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         this(Arrays.asList(projects));
     }
 
-  
     public OsgiRunPanel(List<Project> projects) {
+        this.projects = projects;
         try {
             initComponents();
             //
             jTextField1.setText(vmArgumentsString);
             //
-            jTextField2.setText(NbPreferences.forModule(getClass()).get("bat", ""));
-            jLabel3.setText(NbPreferences.forModule(getClass()).get("platform", ""));
+            iBat.setText(NbPreferences.forModule(getClass()).get("bat", ""));
+            final String platform = NbPreferences.forModule(getClass()).get("platform", "");
+            iPlatform.setText(platform);
 
-            loadProjectsOSGiTable(findProjectOsgiConfiguration(projects));
-            loadExternalLibsTable();
+            if (platform.equals("")) {
+                iPlatform.setText("Select platform first. Then click to reload.");
+            } else {
+                loadProjectsOSGiTable(findProjectOsgiConfiguration(projects));
+                loadExternalLibsTable();
+            }
             //
         } catch (BackingStoreException ex) {
             Exceptions.printStackTrace(ex);
@@ -125,7 +130,7 @@ public class OsgiRunPanel extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        iPlatform = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -138,13 +143,14 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        iBat = new javax.swing.JTextField();
+        jButton4 = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jLabel1.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jLabel2.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(iPlatform, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.iPlatform.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jButton2.text")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -205,7 +211,7 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -222,7 +228,14 @@ public class OsgiRunPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jLabel5.text")); // NOI18N
 
-        jTextField2.setText(org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jTextField2.text")); // NOI18N
+        iBat.setText(org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.iBat.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton4, org.openide.util.NbBundle.getMessage(OsgiRunPanel.class, "OsgiRunPanel.jButton4.text")); // NOI18N
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -242,15 +255,14 @@ public class OsgiRunPanel extends javax.swing.JPanel {
                             .addComponent(jLabel2))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton2))
+                            .addComponent(iBat)
                             .addComponent(jTextField1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jTextField2)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton3)))))
+                            .addComponent(iPlatform, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton4))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -259,22 +271,23 @@ public class OsgiRunPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel3)
+                    .addComponent(iPlatform)
                     .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton3)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel5)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(iBat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -286,7 +299,7 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         if (file == null) {
             return;
         }
-        jLabel3.setText(file.getAbsolutePath());
+        iPlatform.setText(file.getAbsolutePath());
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -343,8 +356,17 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         if (file == null) {
             return;
         }
-        jTextField2.setText(file.getAbsolutePath());
+        iBat.setText(file.getAbsolutePath());
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        try {
+            loadProjectsOSGiTable(findProjectOsgiConfiguration(projects));
+            loadExternalLibsTable();
+        } catch (BackingStoreException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     private void processExternalJar(File file) {
         ((ModulConfigrationTableModel) externalTable.getModel()).add(ExternalModuleConfiguration.createFromJar(file.getAbsolutePath()));
@@ -355,12 +377,14 @@ public class OsgiRunPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable externalTable;
+    private javax.swing.JTextField iBat;
+    private javax.swing.JLabel iPlatform;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
@@ -368,7 +392,6 @@ public class OsgiRunPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JTable projectTable;
     // End of variables declaration//GEN-END:variables
 
@@ -426,17 +449,19 @@ public class OsgiRunPanel extends javax.swing.JPanel {
         getExternalLibsModuleConfiguration().forEach((mc) -> {
             NbPreferences.forModule(getClass()).node("externalLibs").putBoolean(mc.getPath(), mc.isEnable());
         });
-         NbPreferences.forModule(getClass()).put("bat", getBat().getAbsolutePath());
-         NbPreferences.forModule(getClass()).put("platform", getPlatform().getAbsolutePath());
+        NbPreferences.forModule(getClass()).put("bat", getBat().getAbsolutePath());
+        NbPreferences.forModule(getClass()).put("platform", getPlatform().getAbsolutePath());
     }
 
     File getBat() {
-        if(jTextField2.getText().endsWith("OSGi.bat"))return new File(jTextField2.getText());
-        return new File(jTextField2.getText(), "OSGi.bat");
+        if (iBat.getText().endsWith("OSGi.bat")) {
+            return new File(iBat.getText());
+        }
+        return new File(iBat.getText(), "OSGi.bat");
     }
-    
-    File getPlatform(){
-        return new File(jLabel3.getText());
+
+    File getPlatform() {
+        return new File(iPlatform.getText());
     }
 
 }
